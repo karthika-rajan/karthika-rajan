@@ -1,0 +1,54 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# 1. Load the dataset
+data = pd.read_csv("traffic_accidents.csv")  # Replace with your dataset file
+
+# 2. Data Preprocessing
+data.dropna(inplace=True)  # Drop missing values
+
+# Encode categorical variables
+data = pd.get_dummies(data, drop_first=True)
+
+# 3. Feature Selection
+X = data.drop("Accident_Severity", axis=1)  # Features
+y = data["Accident_Severity"]  # Target: e.g. Minor, Serious, Fatal
+
+# 4. Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 5. Model Training
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# 6. Prediction & Evaluation
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Classification Report:\n", classification_report(y_test, y_pred))
+sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d")
+plt.title("Confusion Matrix")
+plt.show()
+
+# 7. Feature Importance
+importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
+features = X.columns
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x=importances[indices], y=features[indices])
+plt.title("Feature Importance")
+plt.show()
+
+# 8. Predict on new data
+def predict_accident_risk(new_data: dict):
+    df = pd.DataFrame([new_data])
+    df = pd.get_dummies(df)
+    df = df.reindex(columns=X.columns, fill_value=0)
+    prediction = model.predict(df)
+    return prediction[0]
+
