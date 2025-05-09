@@ -1,0 +1,35 @@
+Here’s a simple Python example that uses a machine learning model to predict the likelihood of a traffic accident based on sample data (e.g., weather, time of day, and traffic volume):
+
+Simple Python Code: Accident Prediction Using Logistic Regression
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Sample dataset
+data = {
+    'weather': [0, 1, 0, 1, 2, 2],  # 0: Clear, 1: Rain, 2: Fog
+    'time': [8, 9, 17, 18, 20, 23], # Hour of day
+    'traffic_volume': [100, 200, 300, 250, 150, 120], # Cars per hour
+    'accident': [0, 1, 1, 1, 0, 0]  # 0: No accident, 1: Accident
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Features and label
+X = df[['weather', 'time', 'traffic_volume']]
+y = df['accident']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train logistic regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Predict and evaluate
+predictions = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, predictions))
+
